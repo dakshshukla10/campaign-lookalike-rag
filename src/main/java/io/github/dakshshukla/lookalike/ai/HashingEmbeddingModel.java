@@ -13,13 +13,18 @@ import org.springframework.ai.embedding.EmbeddingResponse;
 import io.github.dakshshukla.lookalike.text.TextAnalyzer;
 
 /**
- * Offline embedder: hashes unigrams and bigrams into a fixed-size signed vector and
- * L2-normalises it. It is lexical, so it matches shared words and not meaning, but it is
- * deterministic and needs no network, which is what tests and CI want.
+ * Offline embedder: hashes unigrams and bigrams into a fixed-size vector and L2-normalises it.
+ * It is lexical, so it matches shared words and not meaning, but it is deterministic and needs
+ * no network, which is what tests and CI want.
+ *
+ * <p>All weights are positive and slot 0 carries a small constant, so every pair of texts has a
+ * cosine similarity above zero. pgvector searches drop rows at or below the similarity threshold,
+ * and a filtered search should still return the filtered rows when the words do not overlap.
  */
 public class HashingEmbeddingModel implements EmbeddingModel {
 
     private static final double BIGRAM_WEIGHT = 0.5;
+    private static final double BIAS = 0.5;
 
     private final int dimensions;
 
@@ -52,6 +57,7 @@ public class HashingEmbeddingModel implements EmbeddingModel {
 
     float[] embedText(String text) {
         double[] vector = new double[dimensions];
+        vector[0] = BIAS;
         List<String> tokens = TextAnalyzer.tokens(text);
         for (int i = 0; i < tokens.size(); i++) {
             add(vector, tokens.get(i), 1.0);
@@ -65,9 +71,6 @@ public class HashingEmbeddingModel implements EmbeddingModel {
         }
         norm = Math.sqrt(norm);
         float[] result = new float[dimensions];
-        if (norm == 0) {
-            return result;
-        }
         for (int i = 0; i < dimensions; i++) {
             result[i] = (float) (vector[i] / norm);
         }
@@ -75,11 +78,8 @@ public class HashingEmbeddingModel implements EmbeddingModel {
     }
 
     private void add(double[] vector, String feature, double weight) {
-        long hash = fnv1a(feature);
-        int slot = (int) Long.remainderUnsigned(hash, dimensions);
-        // The top bit picks the sign so unrelated words that collide tend to cancel out.
-        double sign = (hash >>> 63) == 0 ? 1.0 : -1.0;
-        vector[slot] += sign * weight;
+        int slot = (int) Long.remainderUnsigned(fnv1a(feature), dimensions);
+        vector[slot] += weight;
     }
 
     private static long fnv1a(String value) {
