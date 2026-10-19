@@ -1,0 +1,605 @@
+{
+  "briefs": [
+    {
+      "id": "B-001",
+      "description": "Introduce feline feeding tips using a measured portion of kibble.",
+      "category": "pet",
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": 22000,
+      "expected": [
+        "C-0003",
+        "C-0027",
+        "C-0051",
+        "C-0075",
+        "C-0099"
+      ]
+    },
+    {
+      "id": "B-002",
+      "description": "Promote a canine leash for supervised outdoor exercise with a pet.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0019",
+        "C-0043",
+        "C-0067",
+        "C-0091",
+        "C-0115"
+      ]
+    },
+    {
+      "id": "B-003",
+      "description": "Introduce a socket that lets households control an appliance from another room.",
+      "category": "electronics",
+      "audience": null,
+      "channel": "social",
+      "objective": null,
+      "budgetUsd": 62000,
+      "expected": [
+        "C-0008",
+        "C-0032",
+        "C-0056"
+      ]
+    },
+    {
+      "id": "B-004",
+      "description": "Help cooks stock a pantry with lentils for affordable meals.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0022",
+        "C-0046",
+        "C-0070",
+        "C-0094",
+        "C-0118"
+      ]
+    },
+    {
+      "id": "B-005",
+      "description": "Promote jars that free up cupboard space and keep ingredients visible.",
+      "category": "home",
+      "audience": null,
+      "channel": null,
+      "objective": "retention",
+      "budgetUsd": 66000,
+      "expected": [
+        "C-0092",
+        "C-0116"
+      ]
+    },
+    {
+      "id": "B-006",
+      "description": "Remind shoppers to pack sunscreen for a day spent outside.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0017",
+        "C-0041",
+        "C-0065",
+        "C-0089",
+        "C-0113"
+      ]
+    },
+    {
+      "id": "B-007",
+      "description": "Promote a grooming brush for gentle coat care at home.",
+      "category": "pet",
+      "audience": "new-customers",
+      "channel": "in-store-screens",
+      "objective": null,
+      "budgetUsd": 121000,
+      "expected": [
+        "C-0096",
+        "C-0120"
+      ]
+    },
+    {
+      "id": "B-008",
+      "description": "Offer greens in a crate that changes with the growing season.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0011",
+        "C-0035",
+        "C-0059",
+        "C-0083",
+        "C-0107"
+      ]
+    },
+    {
+      "id": "B-009",
+      "description": "Encourage a sitting room update by changing the cushions on the sofa.",
+      "category": "home",
+      "audience": "young-adults",
+      "channel": "in-store-screens",
+      "objective": "conversion",
+      "budgetUsd": 44000,
+      "expected": [
+        "C-0014",
+        "C-0038",
+        "C-0062"
+      ]
+    },
+    {
+      "id": "B-010",
+      "description": "Suggest a ribbon package with a fragrance for seasonal giving.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0018",
+        "C-0042",
+        "C-0066",
+        "C-0090",
+        "C-0114"
+      ]
+    },
+    {
+      "id": "B-011",
+      "description": "Show a toothbrush and floss together for daily mouth care.",
+      "category": "health",
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": 146000,
+      "expected": [
+        "C-0013",
+        "C-0037",
+        "C-0061",
+        "C-0085",
+        "C-0109"
+      ]
+    },
+    {
+      "id": "B-012",
+      "description": "Show a tablet holding notes that can be reviewed before a test.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0006",
+        "C-0030",
+        "C-0054",
+        "C-0078",
+        "C-0102"
+      ]
+    },
+    {
+      "id": "B-013",
+      "description": "Launch a cleanser for daily face care with hydration as the main message.",
+      "category": "beauty",
+      "audience": null,
+      "channel": "display",
+      "objective": null,
+      "budgetUsd": 118000,
+      "expected": [
+        "C-0095",
+        "C-0119"
+      ]
+    },
+    {
+      "id": "B-014",
+      "description": "Promote a jigsaw with large pieces for relaxed picture building.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0007",
+        "C-0031",
+        "C-0055",
+        "C-0079",
+        "C-0103"
+      ]
+    },
+    {
+      "id": "B-015",
+      "description": "Promote cotton clothing for layering through changes in temperature.",
+      "category": "apparel",
+      "audience": null,
+      "channel": null,
+      "objective": "awareness",
+      "budgetUsd": 68000,
+      "expected": [
+        "C-0081",
+        "C-0105"
+      ]
+    },
+    {
+      "id": "B-016",
+      "description": "Show bricks becoming a tower during creative play.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0001",
+        "C-0025",
+        "C-0049",
+        "C-0073",
+        "C-0097"
+      ]
+    },
+    {
+      "id": "B-017",
+      "description": "Offer noodles as a quick supper for a busy evening.",
+      "category": "grocery",
+      "audience": "young-adults",
+      "channel": "email",
+      "objective": null,
+      "budgetUsd": 20000,
+      "expected": [
+        "C-0016",
+        "C-0040",
+        "C-0064"
+      ]
+    },
+    {
+      "id": "B-018",
+      "description": "Sell linen pillow covers as part of a coordinated bedding refresh.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0021",
+        "C-0045",
+        "C-0069",
+        "C-0093",
+        "C-0117"
+      ]
+    },
+    {
+      "id": "B-019",
+      "description": "Help people keep a regular bedtime by planning quieter evenings.",
+      "category": "health",
+      "audience": "new-customers",
+      "channel": "video",
+      "objective": "retention",
+      "budgetUsd": 82000,
+      "expected": [
+        "C-0004",
+        "C-0028",
+        "C-0052"
+      ]
+    },
+    {
+      "id": "B-020",
+      "description": "Offer a waterproof raincoat for everyday trips in the rain.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0012",
+        "C-0036",
+        "C-0060",
+        "C-0084",
+        "C-0108"
+      ]
+    },
+    {
+      "id": "B-021",
+      "description": "Show earbuds playing music with adjustable bass for personal listening.",
+      "category": "electronics",
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": 28000,
+      "expected": [
+        "C-0015",
+        "C-0039",
+        "C-0063",
+        "C-0087",
+        "C-0111"
+      ]
+    },
+    {
+      "id": "B-022",
+      "description": "Sell stretch leggings for bending and moving during exercise.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0005",
+        "C-0029",
+        "C-0053",
+        "C-0077",
+        "C-0101"
+      ]
+    },
+    {
+      "id": "B-023",
+      "description": "Invite children to put on an apron and act out serving lunch.",
+      "category": "toys",
+      "audience": null,
+      "channel": "video",
+      "objective": null,
+      "budgetUsd": 188000,
+      "expected": [
+        "C-0082",
+        "C-0106"
+      ]
+    },
+    {
+      "id": "B-024",
+      "description": "Offer a swatch alongside a miniature beauty selection for testing at home.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0002",
+        "C-0026",
+        "C-0050",
+        "C-0074",
+        "C-0098"
+      ]
+    },
+    {
+      "id": "B-025",
+      "description": "Introduce feline feeding tips using a measured portion of kibble.",
+      "category": "pet",
+      "audience": null,
+      "channel": null,
+      "objective": "conversion",
+      "budgetUsd": 72000,
+      "expected": [
+        "C-0003",
+        "C-0027",
+        "C-0051"
+      ]
+    },
+    {
+      "id": "B-026",
+      "description": "Help dog owners choose a leash for regular walks in the neighborhood.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0019",
+        "C-0043",
+        "C-0067",
+        "C-0091",
+        "C-0115"
+      ]
+    },
+    {
+      "id": "B-027",
+      "description": "Show a sensor and socket working together to control a lamp.",
+      "category": "electronics",
+      "audience": "students",
+      "channel": "social",
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0008",
+        "C-0032",
+        "C-0056"
+      ]
+    },
+    {
+      "id": "B-028",
+      "description": "Help cooks stock a pantry with lentils for affordable meals.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0022",
+        "C-0046",
+        "C-0070",
+        "C-0094",
+        "C-0118"
+      ]
+    },
+    {
+      "id": "B-029",
+      "description": "Help home cooks clear a crowded cupboard with matching containers.",
+      "category": "home",
+      "audience": "families",
+      "channel": "email",
+      "objective": "retention",
+      "budgetUsd": null,
+      "expected": [
+        "C-0092",
+        "C-0116"
+      ]
+    },
+    {
+      "id": "B-030",
+      "description": "Remind shoppers to pack sunscreen for a day spent outside.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0017",
+        "C-0041",
+        "C-0065",
+        "C-0089",
+        "C-0113"
+      ]
+    },
+    {
+      "id": "B-031",
+      "description": "Show grooming steps that remove loose fur without a long session.",
+      "category": "pet",
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0024",
+        "C-0048",
+        "C-0072",
+        "C-0096",
+        "C-0120"
+      ]
+    },
+    {
+      "id": "B-032",
+      "description": "Tell a harvest story around a weekly crate of vegetables.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0011",
+        "C-0035",
+        "C-0059",
+        "C-0083",
+        "C-0107"
+      ]
+    },
+    {
+      "id": "B-033",
+      "description": "Suggest cushions and curtains to give a familiar room a fresh look.",
+      "category": "home",
+      "audience": null,
+      "channel": "video",
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0086",
+        "C-0110"
+      ]
+    },
+    {
+      "id": "B-034",
+      "description": "Promote a ribbon wrapped keepsake as a ready to give beauty present.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0018",
+        "C-0042",
+        "C-0066",
+        "C-0090",
+        "C-0114"
+      ]
+    },
+    {
+      "id": "B-035",
+      "description": "Show a toothbrush and floss together for daily mouth care.",
+      "category": "health",
+      "audience": null,
+      "channel": null,
+      "objective": "consideration",
+      "budgetUsd": null,
+      "expected": [
+        "C-0013",
+        "C-0037",
+        "C-0061"
+      ]
+    },
+    {
+      "id": "B-036",
+      "description": "Introduce a tablet for organizing coursework and reading between classes.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0006",
+        "C-0030",
+        "C-0054",
+        "C-0078",
+        "C-0102"
+      ]
+    },
+    {
+      "id": "B-037",
+      "description": "Launch a cleanser for daily face care with hydration as the main message.",
+      "category": "beauty",
+      "audience": "young-adults",
+      "channel": "video",
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0023",
+        "C-0047",
+        "C-0071"
+      ]
+    },
+    {
+      "id": "B-038",
+      "description": "Promote a jigsaw with large pieces for relaxed picture building.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0007",
+        "C-0031",
+        "C-0055",
+        "C-0079",
+        "C-0103"
+      ]
+    },
+    {
+      "id": "B-039",
+      "description": "Show layering choices with a cardigan over a simple top.",
+      "category": "apparel",
+      "audience": "students",
+      "channel": "video",
+      "objective": "consideration",
+      "budgetUsd": null,
+      "expected": [
+        "C-0009",
+        "C-0033",
+        "C-0057"
+      ]
+    },
+    {
+      "id": "B-040",
+      "description": "Encourage children to build with bricks and try their own designs.",
+      "category": null,
+      "audience": null,
+      "channel": null,
+      "objective": null,
+      "budgetUsd": null,
+      "expected": [
+        "C-0001",
+        "C-0025",
+        "C-0049",
+        "C-0073",
+        "C-0097"
+      ]
+    }
+  ]
+}
