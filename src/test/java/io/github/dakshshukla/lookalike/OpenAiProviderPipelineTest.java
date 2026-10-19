@@ -69,7 +69,7 @@ class OpenAiProviderPipelineTest {
 
     @BeforeEach
     void seed() {
-        jdbc.execute("TRUNCATE campaigns");
+        jdbc.execute("TRUNCATE campaigns CASCADE");
         jdbc.execute("TRUNCATE vector_store_provider_test");
         ingest.ingest(List.of(
                 new Campaign("C-1001", "Pantry push", "grocery", "families", "video", "awareness", 1000, 7, 10, 0.01, 2.0, "rice and lentils"),

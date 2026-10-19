@@ -48,7 +48,7 @@ class EvalGateTest {
 
     @Test
     void metricsStayAtOrAboveTheBaseline() throws Exception {
-        jdbc.execute("TRUNCATE campaigns, vector_store");
+        jdbc.execute("TRUNCATE campaigns, vector_store CASCADE");
         ingest.ingest(CAMPAIGNS);
 
         List<LabelledBrief> briefs = LabelledBriefLoader.load(BRIEFS);

@@ -61,7 +61,7 @@ class PgVectorCampaignRetrieverTest {
 
     @BeforeEach
     void seed() {
-        jdbc.execute("TRUNCATE campaigns, vector_store");
+        jdbc.execute("TRUNCATE campaigns, vector_store CASCADE");
         ingest.ingest(SEED);
     }
 

@@ -29,7 +29,7 @@ class CampaignIngestServiceTest {
 
     @BeforeEach
     void emptyTables() {
-        jdbc.execute("TRUNCATE campaigns, vector_store");
+        jdbc.execute("TRUNCATE campaigns, vector_store CASCADE");
     }
 
     @Test
