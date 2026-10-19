@@ -1,14 +1,15 @@
 <p align="center"><img src="docs/assets/banner.svg" width="100%" alt="campaign-lookalike-rag"/></p>
 
-<h1 align="center">campaign-lookalike-rag — Lookalike Campaign Retrieval</h1>
+<h1 align="center">campaign-lookalike-rag</h1>
 
-<p align="center"><strong>A RAG service that finds comparable past ad campaigns for a new brief and cites every source it uses.</strong></p>
+<p align="center"><strong>A RAG service that finds past ad campaigns similar to a new brief: embeddings, metadata filtering, reranking, structured LLM ranking with cited campaign IDs, a grounding validator, and coverage@K evals.</strong></p>
 
 <p align="center">
   <a href="https://github.com/dakshshukla10/campaign-lookalike-rag/actions/workflows/ci.yml"><img src="https://github.com/dakshshukla10/campaign-lookalike-rag/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="MIT License"/></a>
   <img src="https://img.shields.io/badge/Java-21-orange.svg?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21"/>
   <img src="https://img.shields.io/badge/Spring_Boot-3.5-6DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
+  <img src="https://img.shields.io/badge/Spring_AI-1.1-6DB33F.svg?style=for-the-badge&logo=spring&logoColor=white" alt="Spring AI"/>
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/PostgreSQL-pgvector-336791.svg?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL pgvector"/>
@@ -17,151 +18,166 @@
   <img src="https://img.shields.io/badge/GitHub_Actions-CI-2088FF.svg?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
 </p>
 
-> 🚧 **Status: in active development**
-> _Phase 1 complete — see the roadmap below. Retrieval, reranking and LLM ranking are not built yet._
+---
+
+## Why
+
+Someone planning a retail-media campaign wants to know how comparable past campaigns performed before spending. This service takes a campaign brief, finds similar past campaigns, picks the three closest and says why. Every claim cites a campaign id, and a validator rejects any id that retrieval did not return, so the ranking model cannot make up evidence.
+
+It runs fully offline by default. The embedder and the ranking model are deterministic stand-ins that go through the same Spring AI interfaces and the same JSON parsing as a real provider, so tests and CI need no API key. Setting a profile switches to any OpenAI-compatible endpoint.
 
 ---
 
-## 💡 Why
+## Status
 
-Brands planning a retail-media campaign want to know how similar past campaigns performed before they spend. This service takes a new campaign brief, finds comparable past campaigns, and explains why they are comparable. Every claim points back to a source campaign, and a validator rejects any citation that was not actually retrieved, so the model cannot invent evidence.
+All five phases are built. The sample data is synthetic and the default models are offline stand-ins, which limits what the numbers mean (see [Evaluation](#evaluation)).
 
----
-
-## ✨ Features
-
-| Feature | Status |
-| :-- | :-: |
-| Spring Boot skeleton with `api`, `domain`, `retrieval`, `rerank`, `grounding`, `eval`, `feedback` packages | ✅ |
-| `POST /v1/lookalikes` with the final JSON shape (returns a stub today) | ✅ |
-| Grounding validator that rejects citations not in the retrieved set (unit tested) | ✅ |
-| Docker Compose with pgvector Postgres and Redis, synthetic sample data | ✅ |
-| CI that builds and runs tests on every push | ✅ |
-| Ingestion and embedding into pgvector | 🚧 |
-| Retrieval with metadata filters (category, audience, channel, objective) | 🚧 |
-| Cross-encoder reranking | 📋 |
-| LLM top-3 ranking with structured JSON output | 📋 |
-| Eval harness (coverage@1, coverage@3, grounding rate, regression gate) | 📋 |
-| Feedback loop that re-weights retrieval from past outcomes | 📋 |
-
-🚧 means the work is planned and its issues are open, but no implementation has landed.
+| Area | State |
+| :-- | :-- |
+| CSV load into Postgres (Flyway schema, idempotent upsert, `./gradlew ingest`) | Done |
+| Campaign embeddings in pgvector through Spring AI `PgVectorStore` | Done |
+| Cosine search with category, audience, channel and objective filters | Done |
+| Redis cache for embeddings, fails open when Redis is down | Done |
+| Reranking: lexical cross-scorer by default, chat-model reranker as an option | Done. The model reranker is tested with a stub model only |
+| Top-3 ranking with Spring AI structured output and cited campaign ids | Done |
+| Grounding validator, retry with the rejected ids, fallback slots | Done |
+| Real provider (OpenAI-compatible, including a local Ollama server) | Wired and tested against a local stand-in HTTP server. Never run against a hosted model |
+| Eval harness: coverage@1, coverage@3, grounding rate, CI gate | Done |
+| Outcomes endpoint, outcome re-weighting, offline replay | Done. Re-weighting is off by default |
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    A[Campaign brief] --> B[Embed]
+    A[Campaign brief] --> B[Embed brief<br/>Redis cache]
     B --> C[pgvector search<br/>+ metadata filters]
-    C --> D[Cross-encoder rerank]
-    D --> E[LLM ranks top 3<br/>structured JSON output]
+    C --> D[Rerank]
+    D --> E[Ranker: top 3 as<br/>structured JSON]
     E --> F{Grounding validator}
-    F -->|citations all retrieved| G[Response with citations]
-    F -->|unknown id| H[Reject]
-    G -.outcomes.-> I[(Feedback store)]
+    F -->|all citations retrieved| G[Response with citations]
+    F -->|unknown id| H[Retry, then fallback slot]
+    H --> F
+    G -.outcomes.-> I[(outcomes table)]
     I -.re-weights.-> C
 ```
 
-Only the grounding validator and the HTTP endpoint are real today; the other boxes are placeholders. See [docs/architecture.md](docs/architecture.md) for details.
+[docs/architecture.md](docs/architecture.md) covers each stage, the retry and fallback rules and the known limits.
 
 ---
 
-## 🧰 Tech Stack
+## Tech stack
 
-| Layer | Choice | Status |
-| :-- | :-- | :-: |
-| Language / framework | Java 21, Spring Boot 3.5 (Gradle Kotlin DSL) | ✅ |
-| Vector store | Postgres + pgvector (in `docker-compose.yml`) | 🚧 |
-| Cache | Redis (in `docker-compose.yml`) | 🚧 |
-| LLM orchestration | Spring AI | 📋 |
-| Testing | JUnit 5, Spring Boot Test | ✅ |
-| CI | GitHub Actions | ✅ |
+| Layer | Choice |
+| :-- | :-- |
+| Language and framework | Java 21, Spring Boot 3.5, Gradle Kotlin DSL |
+| LLM and embeddings | Spring AI 1.1: `EmbeddingModel`, `ChatClient`, `BeanOutputConverter`, `VectorStore` |
+| Vector store | Postgres 16 with pgvector (HNSW, cosine), Flyway migrations |
+| Cache | Redis 7, embeddings keyed by a hash of the text |
+| Tests | JUnit 5, Spring Boot Test, Testcontainers (pgvector and Redis) |
+| CI | GitHub Actions, runs the tests and the eval gate |
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 Requires Java 21 and Docker.
 
 ```bash
-# 1. Start Postgres (pgvector) and Redis. The app does not use them yet.
+# 1. Start Postgres (pgvector) and Redis
 docker compose up -d
 
-# 2. Run the app
+# 2. Load the 120 synthetic campaigns and embed them
+./gradlew ingest
+
+# 3. Run the service
 ./gradlew bootRun
 
-# 3. Call the endpoint (returns a stub in Phase 1)
+# 4. Ask for lookalikes
 curl -s -X POST localhost:8080/v1/lookalikes \
   -H 'Content-Type: application/json' \
-  -d '{"description":"Back-to-school promo for parents","category":"grocery","channel":"display","objective":"conversion","budgetUsd":50000}'
+  -d '{"description":"Stock a family pantry with rice and lentils for weekly meals","category":"grocery","budgetUsd":50000}'
+
+# 5. Tell the service how a recommendation worked out
+curl -s -X POST localhost:8080/v1/outcomes \
+  -H 'Content-Type: application/json' \
+  -d '{"campaignId":"C-0094","helpful":true}'
 ```
 
-Run the tests with `./gradlew test`. Copy `.env.example` to `.env` for settings; API keys are read from environment variables only and are never committed.
+Only `description` is required in the brief. `category`, `audience`, `channel` and `objective` act as exact-match filters when set. `budgetUsd` only affects reranking.
 
-Sample data lives in [`data/`](data/) and is entirely synthetic.
+Run the tests with `./gradlew test` (starts a pgvector Postgres and a Redis container through Testcontainers) and the eval gate with `./gradlew eval`. Stop the compose stack with `docker compose down -v` when you are done.
 
----
+### Using a real model
 
-## 📊 Evaluation
+```bash
+set -a; source .env; set +a      # see .env.example
+export SPRING_PROFILES_ACTIVE=openai
+./gradlew bootRun
+```
 
-No results are published yet. The harness (Phase 4) will report:
+The `openai` profile turns on Spring AI's OpenAI chat and embedding models. Point `OPENAI_BASE_URL` at `http://localhost:11434` to use a local Ollama server. The vector table is created with `LOOKALIKE_AI_EMBEDDING_DIMENSIONS` columns, so set it to the embedding model's size and re-ingest after switching models. `lookalike.rerank.mode=model` also lets the chat model score candidates.
 
-- **coverage@1 / coverage@3:** how often a labelled expected campaign appears in the top 1 / top 3
-- **grounding rate:** the share of citations that point at a retrieved campaign
-- **regression check:** the same metrics compared across prompt and model changes, so CI can fail on a drop
+### Settings
 
----
-
-## 🗺️ Roadmap
-
-| Phase | Scope | Status | Milestone |
-| :-- | :-- | :-: | :-- |
-| 1 | Scaffold & grounding validator | ✅ | [Phase 1](https://github.com/dakshshukla10/campaign-lookalike-rag/milestone/1) |
-| 2 | Ingestion + pgvector retrieval with metadata filters | 🚧 | [Phase 2](https://github.com/dakshshukla10/campaign-lookalike-rag/milestone/2) |
-| 3 | Reranking + LLM structured ranking | 📋 | [Phase 3](https://github.com/dakshshukla10/campaign-lookalike-rag/milestone/3) |
-| 4 | Eval harness + CI regression gate | 📋 | [Phase 4](https://github.com/dakshshukla10/campaign-lookalike-rag/milestone/4) |
-| 5 | Feedback loop | 📋 | [Phase 5](https://github.com/dakshshukla10/campaign-lookalike-rag/milestone/5) |
-
-Open issues per phase:
-
-- **Phase 2:** [#5 CSV to Postgres](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/5), [#6 embeddings in pgvector](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/6), [#7 filtered similarity search](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/7), [#8 Testcontainers tests](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/8)
-- **Phase 3:** [#9 reranker](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/9), [#10 LLM structured ranking](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/10), [#11 grounding rejections](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/11)
-- **Phase 4:** [#12 labelled briefs](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/12), [#13 metrics](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/13), [#14 CI regression gate](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/14)
-- **Phase 5:** [#15 record outcomes](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/15), [#16 re-weight retrieval](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/16), [#17 offline replay](https://github.com/dakshshukla10/campaign-lookalike-rag/issues/17)
+| Property | Default | Meaning |
+| :-- | :-- | :-- |
+| `lookalike.ai.provider` | `offline` | `offline` or `openai` (set by the profile) |
+| `lookalike.rerank.mode` | `lexical` | `lexical`, `none` or `model` |
+| `lookalike.ranking.max-attempts` | `2` | Ranker calls before missing slots are filled from reranked order |
+| `lookalike.cache.enabled` | `true` | Cache embeddings in Redis |
+| `lookalike.feedback.reweight.enabled` | `false` | Re-weight retrieval scores with recorded outcomes |
+| `lookalike.feedback.reweight.strength` | `0.05` | Largest score change outcomes can cause, as a fraction |
 
 ---
 
-## 📁 Project Structure
+## Evaluation
+
+`./gradlew eval` runs 40 labelled briefs through the whole pipeline with the default offline models and compares the result with `eval/baseline.json`. The data is synthetic: campaigns and briefs come from word lists, and labels come from the generator's theme assignment by rule. These numbers show the pipeline works on that data. They are not a measure of quality on real campaigns.
+
+| Metric (synthetic data, 40 briefs) | Value |
+| :-- | :-- |
+| coverage@1 | 95.0% |
+| coverage@3 | 95.0% |
+| grounding rate (ranker's first answer) | 100.0% |
+| precision@3 | 86.7% |
+
+Coverage is the share of briefs where the first recommendation, or one of the first three, cites an expected campaign. The two misses are retrieval misses. The grounding rate is 100% because the offline ranker copies ids from its prompt, so the gate mostly guards against code that breaks citations. CI fails when coverage falls more than 2.5 points below the baseline or any citation is ungrounded. [docs/evaluation.md](docs/evaluation.md) has the details, including what the feedback replay showed.
+
+---
+
+## Project structure
 
 ```text
 .
 ├── build.gradle.kts
-├── docker-compose.yml          # pgvector Postgres + Redis
+├── docker-compose.yml            # pgvector Postgres + Redis
 ├── .env.example
-├── data/                       # synthetic sample campaigns + generator
+├── data/                         # synthetic campaigns, labelled briefs, generator
+├── eval/baseline.json            # reference metrics for the CI gate
 ├── docs/
 │   ├── architecture.md
-│   └── assets/banner.svg
+│   └── evaluation.md
 ├── .github/workflows/ci.yml
 └── src/
     ├── main/java/io/github/dakshshukla/lookalike/
-    │   ├── api/                # REST controller, request/response, service
-    │   ├── domain/             # Campaign, CampaignBrief, Recommendation, Citation
-    │   ├── retrieval/          # retriever interface (placeholder impl)
-    │   ├── rerank/             # reranker + LLM ranker interfaces (placeholders)
-    │   ├── grounding/          # GroundingValidator (implemented)
-    │   ├── eval/               # eval harness (planned)
-    │   └── feedback/           # feedback store (planned)
-    └── test/java/...           # JUnit 5 tests
+    │   ├── api/                  # controller, request/response, LookalikeService pipeline
+    │   ├── domain/               # Campaign, CampaignBrief, ScoredCampaign, Recommendation, Citation
+    │   ├── ingest/               # CSV reader, campaign repository, ingest service
+    │   ├── ai/                   # offline embedder and offline chat model
+    │   ├── cache/                # Redis embedding cache
+    │   ├── retrieval/            # pgvector retriever, feedback-weighted retriever
+    │   ├── rerank/               # rerankers, ranker, prompt and payload records
+    │   ├── grounding/            # GroundingValidator
+    │   ├── eval/                 # EvalHarness, report, baseline gate
+    │   ├── feedback/             # outcomes store, endpoint, score weights
+    │   └── config/               # model, retrieval and rerank wiring
+    └── test/java/...             # unit tests and Testcontainers integration tests
 ```
 
 ---
 
-## 📄 License
+## License
 
 [MIT](LICENSE) © Daksh Shukla
-
----
-
-<p align="center"><sub>Built with ❤️ by <a href="https://github.com/dakshshukla10">Daksh Shukla</a></sub></p>
