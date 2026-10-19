@@ -18,15 +18,44 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.ai:spring-ai-bom:1.1.8")
+	}
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+	implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
+	implementation("org.springframework.ai:spring-ai-starter-model-openai")
+
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-database-postgresql")
+	implementation("org.apache.commons:commons-csv:1.12.0")
+	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:postgresql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	maxHeapSize = "512m"
+}
+
+// Loads data/sample_campaigns.csv into Postgres and the vector store, then exits.
+tasks.register<org.springframework.boot.gradle.tasks.run.BootRun>("ingest") {
+	group = "application"
+	description = "Load the sample campaigns into Postgres and pgvector (needs docker compose up)"
+	mainClass = "io.github.dakshshukla.lookalike.CampaignLookalikeRagApplication"
+	classpath = sourceSets["main"].runtimeClasspath
+	args("--lookalike.ingest.path=data/sample_campaigns.csv", "--spring.main.web-application-type=none")
 }
