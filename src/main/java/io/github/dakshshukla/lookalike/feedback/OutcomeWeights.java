@@ -14,6 +14,13 @@ import io.github.dakshshukla.lookalike.domain.ScoredCampaign;
  */
 public final class OutcomeWeights {
 
+    /**
+     * A sweep over 0.02 to 0.25 on the synthetic briefs showed no change up to 0.05 and a lost
+     * held-out brief from 0.10 up. Outcomes are per campaign, not per brief, so a campaign that
+     * was helpful for one brief gets lifted for unrelated ones too; keep the weight small.
+     */
+    public static final double DEFAULT_STRENGTH = 0.05;
+
     private OutcomeWeights() {
     }
 

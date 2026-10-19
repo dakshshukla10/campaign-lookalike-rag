@@ -24,7 +24,7 @@ public class RetrievalConfig {
             CampaignRepository repository,
             FeedbackStore feedbackStore,
             @Value("${lookalike.feedback.reweight.enabled:false}") boolean reweight,
-            @Value("${lookalike.feedback.reweight.strength:0.25}") double strength) {
+            @Value("${lookalike.feedback.reweight.strength:0.05}") double strength) {
         CampaignRetriever vectorSearch = new PgVectorCampaignRetriever(vectorStore, repository);
         return reweight ? new FeedbackWeightedRetriever(vectorSearch, feedbackStore, strength) : vectorSearch;
     }
