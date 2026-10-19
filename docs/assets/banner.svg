@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="280" viewBox="0 0 1200 280" role="img" aria-label="campaign-lookalike-rag banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#1e1b4b"/>
+      <stop offset="1" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.5">
+    <circle cx="1020" cy="140" r="34"/>
+    <circle cx="1100" cy="80" r="18"/>
+    <circle cx="1110" cy="205" r="22"/>
+    <circle cx="940" cy="60" r="12"/>
+    <line x1="1020" y1="140" x2="1100" y2="80"/>
+    <line x1="1020" y1="140" x2="1110" y2="205"/>
+    <line x1="1020" y1="140" x2="940" y2="60"/>
+  </g>
+  <text x="70" y="130" font-family="Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="#f8fafc">campaign-lookalike-rag</text>
+  <rect x="72" y="150" width="120" height="5" rx="2.5" fill="url(#accent)"/>
+  <text x="70" y="205" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#cbd5e1">Find lookalike past ad campaigns to forecast a new one.</text>
+  <text x="70" y="240" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#94a3b8">Filtered retrieval · reranking · grounded citations · evals</text>
+</svg>
