@@ -2,17 +2,14 @@ package io.github.dakshshukla.lookalike.rerank;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
-import io.github.dakshshukla.lookalike.domain.Campaign;
 import io.github.dakshshukla.lookalike.domain.CampaignBrief;
+import io.github.dakshshukla.lookalike.domain.ScoredCampaign;
 
-/** Phase 1 placeholder: keeps the retrieval order unchanged. */
-@Component
+/** Keeps the retrieval order. Selected with {@code lookalike.rerank.mode=none}. */
 public class PassthroughReranker implements Reranker {
 
     @Override
-    public List<Campaign> rerank(CampaignBrief brief, List<Campaign> candidates) {
+    public List<ScoredCampaign> rerank(CampaignBrief brief, List<ScoredCampaign> candidates) {
         return candidates;
     }
 }

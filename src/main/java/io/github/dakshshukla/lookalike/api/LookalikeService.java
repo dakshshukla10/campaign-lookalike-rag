@@ -7,16 +7,14 @@ import org.springframework.stereotype.Service;
 import io.github.dakshshukla.lookalike.domain.Campaign;
 import io.github.dakshshukla.lookalike.domain.CampaignBrief;
 import io.github.dakshshukla.lookalike.domain.Recommendation;
+import io.github.dakshshukla.lookalike.domain.ScoredCampaign;
 import io.github.dakshshukla.lookalike.grounding.GroundingResult;
 import io.github.dakshshukla.lookalike.grounding.GroundingValidator;
 import io.github.dakshshukla.lookalike.rerank.RecommendationRanker;
 import io.github.dakshshukla.lookalike.rerank.Reranker;
 import io.github.dakshshukla.lookalike.retrieval.CampaignRetriever;
 
-/**
- * Wires the pipeline: retrieve, rerank, LLM rank, then grounding validation. In Phase 1 the
- * retrieval, rerank and ranking steps are placeholders; the grounding validator is real.
- */
+/** Wires the pipeline: retrieve, rerank, rank, then grounding validation. */
 @Service
 public class LookalikeService {
 
@@ -40,17 +38,18 @@ public class LookalikeService {
     }
 
     public LookalikeResponse lookalikes(CampaignBrief brief) {
-        List<Campaign> retrieved = retriever.retrieve(brief, CANDIDATES);
-        List<Campaign> reranked = reranker.rerank(brief, retrieved);
+        List<ScoredCampaign> retrieved = retriever.retrieve(brief, CANDIDATES);
+        List<ScoredCampaign> reranked = reranker.rerank(brief, retrieved);
         List<Recommendation> ranked = ranker.rank(brief, reranked, TOP_N);
-        GroundingResult grounding = validator.validate(ranked, retrieved);
+        List<Campaign> retrievedCampaigns = retrieved.stream().map(ScoredCampaign::campaign).toList();
+        GroundingResult grounding = validator.validate(ranked, retrievedCampaigns);
 
         return new LookalikeResponse(
-                "stub",
+                retrieved.isEmpty() ? "no_matches" : "ok",
                 retrieved.size(),
                 grounding.accepted(),
                 new LookalikeResponse.Grounding(
                         grounding.citationsChecked(), grounding.citationsGrounded(), grounding.violations()),
-                List.of("Phase 1 scaffold: retrieval, reranking and LLM ranking are not implemented yet."));
+                List.of());
     }
 }

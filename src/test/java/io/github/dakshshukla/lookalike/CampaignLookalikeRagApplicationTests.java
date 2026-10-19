@@ -1,9 +1,10 @@
 package io.github.dakshshukla.lookalike;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import io.github.dakshshukla.lookalike.support.IntegrationTest;
+
+@IntegrationTest
 class CampaignLookalikeRagApplicationTests {
 
     @Test
