@@ -47,8 +47,35 @@ dependencies {
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
 	maxHeapSize = "512m"
+}
+
+// The eval gate needs the containers and takes a few seconds more, so it has its own task and
+// `check` runs both.
+tasks.test {
+	useJUnitPlatform {
+		excludeTags("eval")
+	}
+}
+
+val eval by tasks.registering(Test::class) {
+	group = "verification"
+	description = "Run the labelled briefs through the pipeline and fail if a metric drops below eval/baseline.json"
+	testClassesDirs = sourceSets["test"].output.classesDirs
+	classpath = sourceSets["test"].runtimeClasspath
+	useJUnitPlatform {
+		includeTags("eval")
+	}
+	testLogging {
+		showStandardStreams = true
+	}
+	systemProperty("eval.updateBaseline", providers.gradleProperty("evalUpdateBaseline").orElse("false").get())
+	outputs.upToDateWhen { false }
+	shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+	dependsOn(eval)
 }
 
 // Loads data/sample_campaigns.csv into Postgres and the vector store, then exits.

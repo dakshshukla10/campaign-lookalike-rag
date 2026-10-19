@@ -1,0 +1,13 @@
+{
+  "note" : "Synthetic data only. Refresh with: ./gradlew eval -PevalUpdateBaseline=true",
+  "metrics" : {
+    "coverageAt1" : 0.95,
+    "coverageAt3" : 0.95,
+    "groundingRate" : 1.0
+  },
+  "maxDrop" : {
+    "coverageAt1" : 0.025,
+    "coverageAt3" : 0.025,
+    "groundingRate" : 0.0
+  }
+}

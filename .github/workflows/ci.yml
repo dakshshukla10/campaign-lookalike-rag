@@ -18,11 +18,22 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build and test
+      # Tests use Testcontainers (pgvector Postgres and Redis), which the runner's Docker provides.
+      # `build` also runs the eval gate (the `eval` task) through `check`.
+      - name: Build, test and run the eval gate
         run: ./gradlew build --no-daemon
-      - name: Upload test report
-        if: failure()
+      - name: Show eval metrics
+        if: always()
+        run: |
+          if [ -f build/reports/eval/eval-report.md ]; then
+            { echo "### Eval (synthetic briefs)"; cat build/reports/eval/eval-report.md; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload test and eval reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: build/reports/tests/test
+          name: reports
+          path: |
+            build/reports/tests/test
+            build/reports/tests/eval
+            build/reports/eval
