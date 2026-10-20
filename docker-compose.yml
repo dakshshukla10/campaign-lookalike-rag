@@ -25,5 +25,25 @@ services:
       timeout: 3s
       retries: 10
 
+  # The application image. Not started by a plain `docker compose up`; use
+  # `docker compose --profile app up --build`. It runs the demo profile: read-only, seeded from
+  # the bundled CSV on first start, per-IP rate limit on.
+  app:
+    profiles: ["app"]
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-lookalike}
+      POSTGRES_USER: ${POSTGRES_USER:-lookalike}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lookalike}
+      REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+
 volumes:
   pgdata:

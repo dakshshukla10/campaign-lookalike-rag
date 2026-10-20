@@ -46,6 +46,11 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// A fixed name lets the Dockerfile copy the jar without guessing the version.
+tasks.bootJar {
+	archiveFileName = "app.jar"
+}
+
 tasks.withType<Test> {
 	maxHeapSize = "512m"
 }
