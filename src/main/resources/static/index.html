@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campaign lookalike search</title>
+<style>
+  :root {
+    --bg: #fafaf8; --fg: #1c1c1a; --muted: #62625c; --line: #dcdcd4; --card: #ffffff;
+    --accent: #1f5f4a; --accent-fg: #ffffff; --warn-bg: #fff6df; --warn-line: #e8d49a;
+    --err: #9b2c2c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151614; --fg: #ecece6; --muted: #a2a29a; --line: #34352f; --card: #1d1e1b;
+      --accent: #5cb592; --accent-fg: #10120f; --warn-bg: #2a2512; --warn-line: #5a4d1c;
+      --err: #ff9b9b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 1.7rem; margin: 0 0 8px; }
+  h2 { font-size: 1.05rem; margin: 28px 0 10px; }
+  p { margin: 0 0 12px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; }
+  .note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 6px; padding: 10px 12px; font-size: .92rem; }
+  form { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-top: 20px; }
+  label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 4px; }
+  label:first-of-type { margin-top: 0; }
+  textarea, input, select {
+    width: 100%; padding: 8px 10px; font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row.three { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 560px) { .row, .row.three { grid-template-columns: 1fr; } }
+  details.filters { margin-top: 12px; }
+  details.filters summary { cursor: pointer; font-size: .9rem; color: var(--muted); }
+  .actions { display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 600; padding: 9px 18px; border: 0; border-radius: 6px; cursor: pointer;
+    background: var(--accent); color: var(--accent-fg);
+  }
+  button:disabled { opacity: .6; cursor: progress; }
+  #status { font-size: .9rem; color: var(--muted); }
+  #status.error { color: var(--err); }
+  .rec { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .rec h3 { margin: 0 0 6px; font-size: 1rem; }
+  .tag { font-size: .72rem; font-weight: 600; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; margin-left: 8px; color: var(--muted); vertical-align: middle; }
+  .cite { font-size: .9rem; margin: 4px 0 0; color: var(--muted); }
+  .cite code { color: var(--fg); }
+  .meta { font-size: .88rem; color: var(--muted); }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 12px; overflow-x: auto; }
+  footer { margin-top: 36px; font-size: .85rem; color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Campaign lookalike search</h1>
+  <p>Describe a campaign you are planning. The service searches a set of past campaigns, picks the three closest and explains each pick. Every explanation cites a campaign id, and a check rejects any id that the search did not return.</p>
+  <p class="note">This hosted demo runs on 120 synthetic campaigns and on offline stand-in models, so the matches reflect shared wording and the figures are invented. It sleeps when idle, and the first request after a break can take a minute while it wakes up.</p>
+
+  <form id="brief">
+    <label for="example">Sample brief</label>
+    <select id="example"></select>
+
+    <label for="description">Description</label>
+    <textarea id="description" required maxlength="2000"></textarea>
+
+    <div class="row">
+      <div>
+        <label for="category">Category</label>
+        <select id="category"></select>
+      </div>
+      <div>
+        <label for="budget">Planned budget (USD)</label>
+        <input id="budget" type="number" min="1" step="1000">
+      </div>
+    </div>
+
+    <details class="filters">
+      <summary>More filters</summary>
+      <div class="row three">
+        <div><label for="audience">Audience</label><select id="audience"></select></div>
+        <div><label for="channel">Channel</label><select id="channel"></select></div>
+        <div><label for="objective">Objective</label><select id="objective"></select></div>
+      </div>
+    </details>
+
+    <div class="actions">
+      <button id="go" type="submit">Find lookalikes</button>
+      <span id="status" role="status" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <section id="results" hidden>
+    <h2>Recommendations</h2>
+    <div id="recs"></div>
+    <p class="meta" id="summary"></p>
+    <details>
+      <summary>Raw JSON</summary>
+      <pre id="raw"></pre>
+    </details>
+  </section>
+
+  <footer>
+    The same call from a shell: <code>POST /v1/lookalikes</code> with a JSON body such as
+    <code>{"description":"...","category":"grocery","budgetUsd":50000}</code>.
+    Health check: <a href="/actuator/health">/actuator/health</a>.
+    Source: <a href="https://github.com/dakshshukla10/campaign-lookalike-rag">github.com/dakshshukla10/campaign-lookalike-rag</a>.
+  </footer>
+</main>
+
+<script>
+(function () {
+  var EXAMPLES = [
+    { label: "Pantry staples", description: "Stock a family pantry with rice and lentils for weekly meals", category: "grocery", budget: 50000 },
+    { label: "Skincare launch", description: "Introduce a new moisturiser to shoppers who are comparing skincare routines", category: "beauty", budget: 80000 },
+    { label: "Dog walks", description: "Leashes and treats for people who walk their dog every morning", category: "pet", budget: 30000 }
+  ];
+  var OPTIONS = {
+    category: ["apparel", "beauty", "electronics", "grocery", "health", "home", "pet", "toys"],
+    audience: ["families", "frequent-shoppers", "new-customers", "seniors", "students", "young-adults"],
+    channel: ["display", "email", "in-store-screens", "social", "sponsored-search", "video"],
+    objective: ["awareness", "consideration", "conversion", "retention"]
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function fillSelect(id, values, anyLabel) {
+    var select = $(id);
+    select.appendChild(new Option(anyLabel, ""));
+    values.forEach(function (v) { select.appendChild(new Option(v, v)); });
+  }
+
+  fillSelect("category", OPTIONS.category, "Any category");
+  fillSelect("audience", OPTIONS.audience, "Any audience");
+  fillSelect("channel", OPTIONS.channel, "Any channel");
+  fillSelect("objective", OPTIONS.objective, "Any objective");
+  EXAMPLES.forEach(function (e, i) { $("example").appendChild(new Option(e.label, String(i))); });
+
+  function loadExample(i) {
+    var e = EXAMPLES[i];
+    $("description").value = e.description;
+    $("category").value = e.category;
+    $("budget").value = e.budget;
+  }
+  $("example").addEventListener("change", function () { loadExample(Number(this.value)); });
+  loadExample(0);
+
+  function text(tag, className, content) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    el.textContent = content;
+    return el;
+  }
+
+  function render(data) {
+    var recs = $("recs");
+    recs.textContent = "";
+    (data.recommendations || []).forEach(function (r) {
+      var card = document.createElement("div");
+      card.className = "rec";
+      var title = text("h3", "", "#" + r.rank + "  " + r.summary);
+      if (r.source === "FALLBACK") title.appendChild(text("span", "tag", "filled from search order"));
+      card.appendChild(title);
+      (r.citations || []).forEach(function (c) {
+        var p = document.createElement("p");
+        p.className = "cite";
+        p.appendChild(text("code", "", c.campaignId));
+        p.appendChild(document.createTextNode("  " + c.reason));
+        card.appendChild(p);
+      });
+      recs.appendChild(card);
+    });
+    var g = data.grounding || {};
+    var parts = [
+      "Status: " + data.status + ".",
+      data.retrievedCount + " campaigns retrieved.",
+      g.citationsGrounded + " of " + g.citationsChecked + " citations matched a retrieved campaign."
+    ];
+    (data.notes || []).forEach(function (n) { parts.push(n); });
+    $("summary").textContent = parts.join(" ");
+    $("raw").textContent = JSON.stringify(data, null, 2);
+    $("results").hidden = false;
+  }
+
+  function setStatus(message, isError) {
+    var el = $("status");
+    el.textContent = message;
+    el.className = isError ? "error" : "";
+  }
+
+  $("brief").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var body = { description: $("description").value.trim() };
+    ["category", "audience", "channel", "objective"].forEach(function (k) {
+      if ($(k).value) body[k] = $(k).value;
+    });
+    if ($("budget").value) body.budgetUsd = Number($("budget").value);
+
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 120000);
+    var slow = setTimeout(function () {
+      setStatus("Still working. If the demo was asleep, waking it can take about a minute.", false);
+    }, 4000);
+
+    $("go").disabled = true;
+    setStatus("Searching...", false);
+    fetch("/v1/lookalikes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    }).then(function (res) {
+      return res.text().then(function (raw) {
+        var data = null;
+        try { data = JSON.parse(raw); } catch (e) { /* not JSON, handled below */ }
+        if (!res.ok) {
+          var detail = data && (data.detail || data.title);
+          throw new Error(res.status === 429 ? (detail || "Too many requests, try again shortly.")
+            : "The server answered " + res.status + (detail ? ": " + detail : "."));
+        }
+        if (!data) throw new Error("The server sent a reply that is not JSON.");
+        return data;
+      });
+    }).then(function (data) {
+      render(data);
+      setStatus("", false);
+    }).catch(function (err) {
+      setStatus(err.name === "AbortError" ? "No answer after two minutes. Try again in a moment." : err.message, true);
+    }).finally(function () {
+      clearTimeout(timer);
+      clearTimeout(slow);
+      $("go").disabled = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>
