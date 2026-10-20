@@ -2,6 +2,7 @@ package io.github.dakshshukla.lookalike.feedback;
 
 import jakarta.validation.Valid;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.github.dakshshukla.lookalike.ingest.CampaignRepository;
 
+/** Not registered when {@code lookalike.feedback.endpoint.enabled=false}, as in the demo profile. */
 @RestController
+@ConditionalOnProperty(name = "lookalike.feedback.endpoint.enabled", havingValue = "true", matchIfMissing = true)
 @RequestMapping("/v1")
 public class OutcomeController {
 
